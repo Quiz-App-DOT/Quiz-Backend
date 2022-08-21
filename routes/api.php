@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ApiAuthController;
+use App\Http\Controllers\User\ApiUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,5 +22,6 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 });
 
 Route::group(['middleware' => ['cors', 'json.response', 'auth:api']], function () {
-    Route::get('/me',  );
+    Route::get('/me', [ApiUserController::class, 'getOneUserByToken']);
+    Route::put('/me', [ApiUserController::class, 'updateOneUserByToken']);
 });
