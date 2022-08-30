@@ -16,6 +16,18 @@ class ApiUserController extends Controller
         return response($user, 200);
     }
 
+    public function getOneUserById($id) {
+        $validator = Validator::make(['id' => $id], [
+            'id' => 'exists:users,id',
+        ]);
+        if ($validator->fails())
+            return response(['errors'=>$validator->errors()->all()], 422);
+
+        $user = User::where('id', $id)->first();
+
+        return response($user, 200);
+    }
+
     public function updateOneUserByToken(Request $request) {
         $validator = Validator::make($request->all(), [
             auth()->id() => 'exists:users,id',
