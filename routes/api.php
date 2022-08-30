@@ -28,4 +28,5 @@ Route::group(['middleware' => ['cors', 'json.response', 'auth:api']], function (
 
     Route::get('/quiz', [ApiQuizController::class, 'sendQuiz']);
     Route::get('/my/quiz', [ApiQuizController::class, 'getAllQuizByUser']);
+    Route::post('/quiz', [ApiQuizController::class, 'addQuiz']);
 });
