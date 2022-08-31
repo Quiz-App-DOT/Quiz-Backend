@@ -4,49 +4,49 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
+use Error;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 class ApiUserController extends Controller
 {
+
+    private UserService $userService;
+
+    public function __construct(UserService $userService) 
+    {
+        $this->userService = $userService;
+    }
+
     public function getOneUserByToken() {
-        $user = User::where('id', auth()->user()['id'])->first();
+        try {
+            $user = $this->userService->getOneUserByToken(auth()->user()['id']);
+
+            return response($user, 200);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
 
         return response($user, 200);
     }
 
     public function getOneUserById($id) {
-        $validator = Validator::make(['id' => $id], [
-            'id' => 'exists:users,id',
-        ]);
-        if ($validator->fails())
-            return response(['errors'=>$validator->errors()->all()], 422);
-
-        $user = User::where('id', $id)->first();
-
-        return response($user, 200);
+        try {
+            $user = $this->userService->getOneUserById($id);
+            
+            return response($user, $user['status'] ?? 200);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
     }
 
     public function updateOneUserByToken(Request $request) {
-        $validator = Validator::make($request->all(), [
-            auth()->id() => 'exists:users,id',
-            'fullName' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,'.auth()->user()['id'],
-            'email' => 'required|string|email|max:255|unique:users,email,'.auth()->user()['id'],
-            'password' => 'string|min:6',
-        ]);
-        if ($validator->fails())
-            return response(['errors'=>$validator->errors()->all()], 422);
-    
-        $user = User::where('id', auth()->user()['id'])->first();
-        $user['fullName'] = $request['fullName'];
-        $user['username'] = $request['username'];
-        $user['email'] = $request['email'];
-        $user['password'] = $request['password'] ? $request['password'] : $user['password'];
-
-        $user->save();
-
-        return response($user, 200);
+        try {
+            $user = $this->userService->updateOneUserByToken($request);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
     }
 }

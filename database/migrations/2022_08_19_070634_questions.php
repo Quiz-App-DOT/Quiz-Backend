@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('quizId')->references('id')->on('quizzes')->onDelete('cascade');
             $table->text('descriptopn');
             $table->string('choices');
+            $table->string('correct_answer');
             $table->string('userChoice');
             $table->boolean('status');
             $table->timestamps();
