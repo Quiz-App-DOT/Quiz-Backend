@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Answer\ApiAnsController;
 use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\Quiz\ApiQuizController;
 use App\Http\Controllers\User\ApiUserController;
@@ -30,4 +31,6 @@ Route::group(['middleware' => ['cors', 'json.response', 'auth:api']], function (
     Route::get('/my/quiz', [ApiQuizController::class, 'getAllQuizByUser']);
     Route::get('/quiz/{id}', [ApiQuizController::class, 'getQuizById']);
     Route::post('/quiz', [ApiQuizController::class, 'addQuiz']);
+
+    Route::get('/ans/quiz/{id}', [ApiAnsController::class, 'getAllAnsByQuizId']);
 });

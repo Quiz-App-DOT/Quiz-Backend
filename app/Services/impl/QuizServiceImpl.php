@@ -2,6 +2,7 @@
 
 namespace App\Services\impl;
 
+use App\Models\Answer;
 use App\Models\Quiz;
 use App\Services\QuizService;
 use Carbon\Carbon;
@@ -65,11 +66,37 @@ class QuizServiceImpl implements QuizService
 
             $quiz = Quiz::create(["userId" => $data['userId'], "start" => Carbon::now(), "end" => Carbon::now(), "correct" => 0, "wrong" => 0, "score" => 0]);
 
-            return ["Quiz" => $quiz, "status" => 200];
+            return $quiz;
         } catch (Error $err) {
             $err['status'] = 500;
             return $err;
         }
+    }
 
+    public function updateScoreQuiz($id) {
+        try {
+            $validator = Validator::make(['id' => $id], [
+                'id' => 'required|integer|exists:quizzes,id'
+            ]);
+            if ($validator->fails())
+                return (['errors'=>$validator->errors()->all(), 'status' => 422]);
+            
+            $quiz = Quiz::where('id', $id)->first();
+            $ans = Answer::where('quizId', $id)->get();
+            foreach ($ans as $data) {
+                if ($data['status']) {
+                    $quiz['correct'] = $quiz['correct'] + 1;
+                    $quiz['score'] = $quiz['score'] + 10;
+                } else {
+                    $quiz['wrong'] = $quiz['wrong'] + 1;
+                }
+            }
+    
+            $quiz->save();
+    
+            return $quiz;
+        } catch (Error $err) {
+            return $err;
+        }
     }
 }
