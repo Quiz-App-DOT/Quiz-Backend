@@ -45,6 +45,8 @@ class ApiUserController extends Controller
     public function updateOneUserByToken(Request $request) {
         try {
             $user = $this->userService->updateOneUserByToken($request);
+        
+            return response($user, $user['status'] ?? 200);
         } catch (Error $err) {
             return response(["Message" => "Internal Server Error"], 500);
         }
