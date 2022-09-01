@@ -7,58 +7,33 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Quiz App (Queez)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi kuis menggunakan backend laravel dan frontend react. Aplikasi dibangun dengan menggunakan model service. Aplikasi dapat menampung data user serta kuis yang pernah diikuti oleh user.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Depedency
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Depedencies yang digunakan untuk Backend
+- [Guzzle](https://docs.guzzlephp.org/en/stable/)
+- [JWT](https://github.com/tymondesigns/jwt-auth)
 
-## Learning Laravel
+## Config & Running
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Hal yang perlu disetup di awal:
+- jalankan command composser install dahulu
+- tambahkan cors dan force.jsonresponse pada http/app/kernel
+- tambahkan cors dan json response ke dalam middleware
+- ubah config auth menjadi jwt untuk bagian api
+- buat database (pgsql atau mysql) pada kasus ini saya menggunakan pgsql. Kemudian setup database ke dalam .env
+- buat variable env yaitu JWT_SECRET dengan value bebas
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Cara menjalankan code:
+- gunakan command php artisan migrate:refresh --seed dahulu untuk melakukan inisiasi database
+- gunakan command php artisan serv untuk menjalankan code
 
-## Laravel Sponsors
+## Deployment
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Deploy backend terletak pada link https://quiz-dot-backend.herokuapp.com
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Deploy frontend terletak pada link https://dot-quiz.netlify.app
+dengan CI/CD ke github https://github.com/Quiz-App-DOT/Quiz-Frontend
