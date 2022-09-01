@@ -3,14 +3,23 @@
 namespace App\Http\Controllers\Quiz;
 
 use App\Http\Controllers\Controller;
-use App\Models\Quiz;
+use App\Services\AnsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use App\Services\QuizService;
+use Error;
 
 class ApiQuizController extends Controller
 {
+    private QuizService $quizService;
+    private AnsService $ansService;
+
+    public function __construct(QuizService $quizService, AnsService $ansService) 
+    {   
+        $this->quizService = $quizService;
+        $this->ansService = $ansService;
+    }
+
     public function sendQuiz() {
         // NOTE : DISABLE VERIFY GUZZLE IN VENDOR
         $response = Http::get('https://opentdb.com/api.php?amount=10&category=18&type=multiple');
@@ -19,45 +28,40 @@ class ApiQuizController extends Controller
     }
 
     public function getAllQuizByUser() {
-        $validator = Validator::make(["id" => auth()->user()['id']], [
-            'id' => 'exists:users,id',
-        ]);
-        if ($validator->fails())
-            return response(['errors'=>$validator->errors()->all()], 422);
-    
-        $quiz = Quiz::where('userId', auth()->user()['id'])->get();
-        
-        return response($quiz, 200);
+        try {
+            $quiz = $this->quizService->getAllQuizByUser(auth()->user()['id']);
+            
+            return response($quiz, $quiz['status'] ?? 200);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
     }
 
-    public function getOneQuizById($id) {
-        $validator = Validator::make(["id" => $id], [
-            'id' => 'exists:quizzes,id',
-        ]);
-        if ($validator->fails())
-            return response(['errors'=>$validator->errors()->all()], 422);
-    
-        $quiz = Quiz::where('id', $id)->first();
-        
-        return response($quiz, 200);
+    public function getQuizById($id) {
+        try {
+            $quiz = $this->quizService->getQuizById($id);
+            
+            return response($quiz, $quiz['status'] ?? 200);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
     }
 
     public function addQuiz(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'choices' => 'required|array|size:10',
-            'choices.*' => Rule::in(['a','b','c','d', null]),
-            'question' => 'required|array|size:10',
-            'question.*.answers' => 'required|array|size:4',
-            'question.*.category' => 'required|string',
-            'question.*.correct_answer' => 'required|string',
-            'question.*.difficulty' => 'required|string',
-            'question.*.incorrect_answers' => 'required|array|size:3',
-            'question.*.question' => 'required|string',
-            'question.*.type' => 'required|string',
-        ]);
-        if ($validator->fails())
-            return response(['errors'=>$validator->errors()->all()], 422);
-    
-        
+        try {
+            $quiz = $this->quizService->addQuiz($request);
+
+            $request['quizId'] = $quiz['id'];
+            $ans = $this->ansService->addManyAns($request);
+
+            $quiz = $this->quizService->updateScoreQuiz($quiz['id']);
+
+            $status = $quiz['status'] ?? 200;
+            $status == 200 ? $status = $ans['status'] ?? 200 : null;
+
+            return response(['Quiz' => $quiz, 'Ans' => $ans], $status);
+        } catch (Error $err) {
+            return response(["Message" => "Internal Server Error"], 500);
+        }
     }
 }
