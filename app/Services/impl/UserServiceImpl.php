@@ -5,6 +5,7 @@ namespace App\Services\impl;
 use App\Models\User;
 use App\Services\UserService;
 use Error;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -44,6 +45,7 @@ class UserServiceImpl implements UserService
                 'username' => 'required|string|max:255|unique:users,username,'.auth()->user()['id'],
                 'email' => 'required|string|email|max:255|unique:users,email,'.auth()->user()['id'],
                 'password' => 'string|min:6',
+                'password_confirmation' => 'string|min:6',
             ]);
             if ($validator->fails())
                 return (['errors'=>$validator->errors()->all(), 'status' => 422]);
@@ -52,8 +54,15 @@ class UserServiceImpl implements UserService
             $user['fullName'] = $data['fullName'];
             $user['username'] = $data['username'];
             $user['email'] = $data['email'];
-            $user['password'] = $data['password'] ? $data['password'] : $user['password'];
-    
+            
+            if ($data['password'] && $data['password_confirmation']) {
+                if (Hash::check($data['password_confirmation'], $user['password'])) {
+                    $user['password'] = Hash::make($data['password']);
+                } else {
+                    return (['errors'=>'Previous Password not Match', 'status' => 422]);
+                }
+            }
+            
             $user->save();
         
             return $user;
